@@ -1,0 +1,80 @@
+Retrieval-Augmented Generation: A Technical Overview
+=====================================================
+
+What is RAG?
+------------
+Retrieval-Augmented Generation (RAG) is an AI architecture that combines a retrieval
+system with a large language model (LLM) to produce answers grounded in a specific
+knowledge base. Rather than relying solely on information encoded in the LLM's weights
+during training, RAG fetches relevant passages from an external document store at
+query time and injects them into the LLM's prompt as context.
+
+The core motivation for RAG is reducing hallucination — the tendency of LLMs to
+confidently generate plausible but factually incorrect information. By anchoring the
+model's response to retrieved passages, RAG makes it possible to verify claims against
+source documents and to update knowledge without retraining the model.
+
+Key Components
+--------------
+A RAG pipeline has three mandatory stages:
+
+1. Indexing
+   Source documents are split into overlapping text chunks (typically 512–1000 tokens
+   with 10–20% overlap) and converted into dense vector embeddings using an embedding
+   model such as all-MiniLM-L6-v2 or text-embedding-3-small. These embeddings are
+   stored in a vector database such as ChromaDB, Pinecone, or pgvector.
+
+2. Retrieval
+   When a user submits a query, the same embedding model encodes the query into a
+   vector. A nearest-neighbour search returns the top-k most semantically similar
+   chunks from the vector store. Common similarity measures include cosine similarity
+   and dot product. Typical values for k range from 3 to 8.
+
+3. Generation
+   The retrieved chunks are concatenated and inserted into a prompt template alongside
+   the original user question. The LLM then generates a response conditioned on both
+   the user question and the retrieved context.
+
+Evaluation Metrics
+------------------
+RAG systems are evaluated along four main dimensions using frameworks such as RAGAS:
+
+- Faithfulness: measures whether each statement in the generated answer can be
+  inferred from the retrieved context. A low faithfulness score indicates hallucination.
+
+- Answer Relevancy: measures how directly the answer addresses the user's question,
+  regardless of factual correctness.
+
+- Context Precision: measures whether the retrieved chunks are actually useful for
+  answering the question. High context precision means the retriever found relevant
+  documents; low precision means it retrieved noise.
+
+- Context Recall: measures how much of the ground-truth answer is covered by the
+  retrieved context. Low recall means relevant information was missed during retrieval.
+
+All four metrics return a value between 0.0 and 1.0. A production-grade RAG system
+typically aims for faithfulness ≥ 0.85 and answer relevancy ≥ 0.80.
+
+Common Failure Modes
+--------------------
+The three most frequent causes of poor RAG performance are:
+
+1. Chunking mismatch: chunks are too small (losing context) or too large (diluting
+   signal). Optimal chunk size depends on the document type and the LLM's context window.
+
+2. Retrieval failure: the embedding model maps the query and the relevant passage to
+   distant points in vector space, causing the top-k results to miss critical information.
+   Hybrid search (combining dense embeddings with keyword BM25 scoring) often helps.
+
+3. Lost in the middle: LLMs tend to attend more to content at the start and end of the
+   context window. When many chunks are retrieved, passages placed in the middle of the
+   prompt may be ignored even if they are relevant.
+
+Conversational RAG
+------------------
+In a multi-turn conversational RAG system, follow-up questions often contain pronouns
+and references ("What did it say about X?") that cannot be understood without the
+conversation history. A common solution is to first rewrite the user's latest message
+into a standalone question using the conversation history and a separate LLM call,
+then retrieve against the rewritten question. This step is called query contextualization
+or question rewriting.

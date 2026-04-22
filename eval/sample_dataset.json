@@ -1,0 +1,25 @@
+{
+  "description": "Sample evaluation dataset for rag-assistant. Questions are grounded in eval/sample_doc.txt.",
+  "samples": [
+    {
+      "question": "What is Retrieval-Augmented Generation and why is it used?",
+      "ground_truth": "Retrieval-Augmented Generation (RAG) is an AI architecture that combines a retrieval system with a large language model to produce answers grounded in a specific knowledge base. It is used to reduce hallucination by anchoring model responses to retrieved passages from an external document store, and to update knowledge without retraining the model."
+    },
+    {
+      "question": "What are the three mandatory stages of a RAG pipeline?",
+      "ground_truth": "The three mandatory stages are: Indexing (splitting documents into chunks and storing their embeddings in a vector database), Retrieval (encoding the query and fetching the top-k most semantically similar chunks), and Generation (inserting the retrieved chunks and the question into a prompt and generating an answer with the LLM)."
+    },
+    {
+      "question": "What does the faithfulness metric measure in RAG evaluation?",
+      "ground_truth": "Faithfulness measures whether each statement in the generated answer can be inferred from the retrieved context. A low faithfulness score indicates hallucination."
+    },
+    {
+      "question": "What is query contextualization and why is it needed in conversational RAG?",
+      "ground_truth": "Query contextualization (also called question rewriting) rewrites the user's latest message into a standalone question using the conversation history. It is needed because follow-up questions in multi-turn conversations often contain pronouns and references that cannot be understood without the conversation history, making direct retrieval unreliable."
+    },
+    {
+      "question": "What are the three most common causes of poor RAG performance?",
+      "ground_truth": "The three most common causes are: chunking mismatch (chunks are too small or too large), retrieval failure (the embedding model maps the query and relevant passage to distant points in vector space), and the 'lost in the middle' problem (LLMs attend less to passages placed in the middle of the context window)."
+    }
+  ]
+}

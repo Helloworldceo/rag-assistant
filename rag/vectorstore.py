@@ -46,7 +46,11 @@ class VectorStoreManager:
             search_type="similarity",
             search_kwargs={"k": k},
         )
-
+    def delete_by_source(self, source_name: str) -> None:
+        """Delete all chunks from a specific source file"""
+        self.collection.delete(where={"source": source_name})
+        # Update chunk count attribute
+        self.chunk_count = self.collection.count()
     # ── Metadata ──────────────────────────────────────────────────────────────
 
     @property

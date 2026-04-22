@@ -1,0 +1,15 @@
+[server]
+# Increase max upload size from the default 200 MB
+maxUploadSize = 50
+enableXsrfProtection = true
+enableCORS = false
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+primaryColor      = "#4f6ef7"
+backgroundColor   = "#ffffff"
+secondaryBackgroundColor = "#f0f4ff"
+textColor         = "#1f2937"
+font              = "sans serif"

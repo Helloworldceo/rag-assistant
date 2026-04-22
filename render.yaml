@@ -1,0 +1,32 @@
+# Render.com deployment manifest
+# Deploy with one click: https://render.com/deploy
+# Docs: https://render.com/docs/render-yaml-reference
+
+services:
+  - type: web
+    name: rag-assistant
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter          # free tier — upgrade to "standard" for persistent disk
+
+    # Environment variables
+    # Set DEEPSEEK_API_KEY and LANGCHAIN_API_KEY in the Render dashboard.
+    # Never commit real keys here.
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        sync: false        # Render will prompt you for the value on first deploy
+
+      # LangSmith tracing — optional but recommended
+      - key: LANGCHAIN_TRACING_V2
+        value: "true"
+      - key: LANGCHAIN_API_KEY
+        sync: false
+      - key: LANGCHAIN_PROJECT
+        value: "rag-assistant-prod"
+
+    # Persistent disk so uploaded documents survive redeploys.
+    # Only available on paid plans; remove this block on the free tier.
+    disk:
+      name: chroma-data
+      mountPath: /app/chroma_db
+      sizeGB: 1
